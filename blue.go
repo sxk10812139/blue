@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+type HandlerFunc func(ctx *Context)
+
 type Engine struct {
 	methodRoutes   []MethodRoute
 	globalMidwares []Midware
@@ -14,7 +16,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	e.handleRequest(c)
 }
 
-func (e *Engine) findHandler(c *Context) (func(c *Context), error) {
+func (e *Engine) findHandler(c *Context) (HandlerFunc, error) {
 	path := c.Request.URL.Path
 	method := c.Request.Method
 	for _, methodRoute := range e.methodRoutes {
@@ -36,7 +38,10 @@ func (e *Engine) findHandler(c *Context) (func(c *Context), error) {
 func (e *Engine) handleRequest(c *Context) {
 	handler, err := e.findHandler(c)
 	if err != nil {
-		debugLog(err)
+		DebugLog(err)
+
+		//重定向到404
+		return
 	}
 	//处理全局中间件
 	for _, globalMidware := range e.globalMidwares {
@@ -46,11 +51,12 @@ func (e *Engine) handleRequest(c *Context) {
 	handler(c)
 }
 
-func (e *Engine) Run() {
-	http.ListenAndServe(":8080", e)
+func (e *Engine) Run(addr string) {
+
+	http.ListenAndServe(addr, e)
 }
 
-func (e *Engine) AddRoute(method string, path string, handler func(c *Context)) {
+func (e *Engine) AddRoute(method string, path string, handler HandlerFunc) {
 	for index, methodRoute := range e.methodRoutes {
 		if methodRoute.Method == method {
 			e.methodRoutes[index].RouteNodes = append(e.methodRoutes[index].RouteNodes, RouteNode{path: path, handler: handler})
@@ -62,19 +68,19 @@ func (e *Engine) AddRoute(method string, path string, handler func(c *Context)) 
 	e.methodRoutes = append(e.methodRoutes, MethodRoute{Method: method, RouteNodes: []RouteNode{routeNode}})
 }
 
-func (e *Engine) GET(path string, handler func(c *Context)) {
+func (e *Engine) GET(path string, handler HandlerFunc) {
 	e.AddRoute("GET", path, handler)
 }
 
-func (e *Engine) POST(path string, handler func(c *Context)) {
+func (e *Engine) POST(path string, handler HandlerFunc) {
 	e.AddRoute("POST", path, handler)
 }
 
-func (e *Engine) DELETE(path string, handler func(c *Context)) {
+func (e *Engine) DELETE(path string, handler HandlerFunc) {
 	e.AddRoute("DELETE", path, handler)
 }
 
-func (e *Engine) AddGlobalMidware(midware func(c *Context)) {
+func (e *Engine) AddGlobalMidware(midware Midware) {
 	e.globalMidwares = append(e.globalMidwares, midware)
 }
 
@@ -85,31 +91,14 @@ type MethodRoute struct {
 
 type RouteNode struct {
 	path    string
-	handler func(c *Context)
+	handler HandlerFunc
 }
 
-type Midware func(c *Context)
-
-type Context struct {
-	Request        *http.Request
-	ResponseWriter http.ResponseWriter
-	engine         *Engine
-}
-
-func (c *Context) Json() {
-
-}
-
-func debugLog(e interface{}) {
-
-}
+type Midware HandlerFunc
 
 func NewEngine() *Engine {
-	return &Engine{globalMidwares: []Midware{}, methodRoutes: []MethodRoute{}}
-}
+	e := &Engine{globalMidwares: []Midware{}, methodRoutes: []MethodRoute{}}
 
-func Run() {
-	e := NewEngine()
-
-	e.Run()
+	e.AddGlobalMidware(LogMidware)
+	return e
 }
