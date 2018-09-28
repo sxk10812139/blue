@@ -13,14 +13,14 @@ func main() {
 	e.Run(":8080")
 }
 
-func CustomGlobalMidware(c *blue.Context) {
-	blue.DebugLog("自定义全局中间件 请求前")
-	c.Next()
-	blue.DebugLog("自定义全局中间件 请求后")
-}
-
 func HelloWorld(c *blue.Context) {
 	c.String("helloworld")
+}
+
+func CustomGlobalMidware(c *blue.Context) {
+	blue.DebugLog("custom midware before")
+	c.Next()
+	blue.DebugLog("custom midware after")
 }
 
 func Json(c *blue.Context) {
@@ -29,8 +29,8 @@ func Json(c *blue.Context) {
 		A string
 		B string
 	}{
-		A: "nihao",
-		B: "ssd",
+		A: "a",
+		B: "b",
 	}
 	c.Json(a)
 }
@@ -39,5 +39,6 @@ func User(c *blue.Context) {
 	name := c.Params.ByName("name")
 	c.String(name)
 }
+
 
 ```
