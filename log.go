@@ -5,5 +5,7 @@ func LogMidware(c *Context) {
 	raw := c.Request.URL.RawQuery
 	method := c.Request.Method
 
-	DebugLog("全局中间件", method, path, raw)
+	DebugLog("全局中间件 请求前", method, path, raw)
+	c.Next()
+	DebugLog("全局中间件 请求后", method, path, raw)
 }
