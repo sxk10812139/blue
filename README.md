@@ -26,7 +26,7 @@ func CustomGlobalMidware(c *blue.Context) {
 func Json(c *blue.Context) {
 	var a interface{}
 	a = struct {
-		A string
+		A string  
 		B string
 	}{
 		A: "a",
