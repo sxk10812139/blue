@@ -45,6 +45,7 @@ func (e *Engine) handle404(c *Context) {
 
 func (e *Engine) Run(addr string) {
 
+	DebugLog("start listening " + addr)
 	http.ListenAndServe(addr, e)
 }
 
