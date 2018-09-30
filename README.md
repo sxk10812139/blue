@@ -24,9 +24,10 @@ simple go web framework
 ```
 func main() {
 	e := blue.NewEngine()
-	e.AddRoute("GET", "/helloworld", HelloWorld)
-	e.AddRoute("GET", "/json", Json)
-	e.AddRoute("GET", "/user/:name", User)
+	e.GET("/helloworld", HelloWorld)
+	e.GET("/json", Json)
+	e.GET("/query", Query)
+	e.ANY("/user/:name", User)
 
 	e.AddGlobalMidware(CustomGlobalMidware())
 	e.Run(":8082")
