@@ -8,7 +8,7 @@ simple go web framework
     - [ ] Route group
     - [ ] Basic midware
 * Request
-    - [ ] Query process
+    - [x] Query process
     - [ ] Form process
     - [ ] Upload process
     - [ ] Data validataion

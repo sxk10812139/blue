@@ -74,6 +74,11 @@ func (e *Engine) DELETE(path string, handler HandlerFunc) {
 	e.AddRoute("DELETE", path, handler)
 }
 
+func (e *Engine) ANY(path string, handler HandlerFunc) {
+	e.GET(path, handler)
+	e.POST(path, handler)
+}
+
 func (e *Engine) AddGlobalMidware(midware HandlerFunc) {
 	e.globalMidwares = append(e.globalMidwares, midware)
 }
