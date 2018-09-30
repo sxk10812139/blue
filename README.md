@@ -59,8 +59,11 @@ func Json(c *blue.Context) {
 
 func User(c *blue.Context) {
 	name := c.Params.ByName("name")
+	a := c.PostDefault("a", "")
+	fmt.Printf("%v", a)
 	c.String(name)
 }
+
 
 
 ```
