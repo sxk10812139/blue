@@ -2,8 +2,13 @@ package blue
 
 import (
 	"encoding/json"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"os"
 )
+
+type C map[string]interface{}
 
 type Context struct {
 	Request        *http.Request
@@ -15,13 +20,14 @@ type Context struct {
 	parsed         bool
 }
 
-func (c *Context) Json(data interface{}) {
+func (c *Context) Json(status int, data interface{}) {
 
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		DebugLog(err)
 	}
 	c.ResponseWriter.Write(jsonBytes)
+	c.ResponseWriter.WriteHeader(status)
 }
 
 func (c *Context) String(s string) {
@@ -42,7 +48,7 @@ func (c *Context) Get(key string) string {
 }
 
 func (c *Context) Post(key string) string {
-	c.PostDefault(key, "")
+	return c.PostDefault(key, "")
 }
 
 func (c *Context) GetDefault(key string, defaultValue string) string {
@@ -85,6 +91,32 @@ func (c *Context) parseForm() {
 	if !c.parsed {
 		c.Request.ParseForm()
 	}
+}
+
+func (c *Context) FormFile(file string) (*multipart.FileHeader, error) {
+	_, fh, err := c.Request.FormFile(file)
+	return fh, err
+}
+
+func (c *Context) SaveUploadedFile(fh *multipart.FileHeader, dst string) error {
+
+	s, err := fh.Open()
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	d, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+
+	_, err = io.Copy(d, s)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 /**************flowcontrol************************/

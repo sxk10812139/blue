@@ -74,6 +74,18 @@ func (e *Engine) DELETE(path string, handler HandlerFunc) {
 	e.AddRoute("DELETE", path, handler)
 }
 
+func (e *Engine) PATCH(path string, handler HandlerFunc) {
+	e.AddRoute("DELETE", path, handler)
+}
+
+func (e *Engine) OPTIONS(path string, handler HandlerFunc) {
+	e.AddRoute("DELETE", path, handler)
+}
+
+func (e *Engine) HEAD(path string, handler HandlerFunc) {
+	e.AddRoute("DELETE", path, handler)
+}
+
 func (e *Engine) ANY(path string, handler HandlerFunc) {
 	e.GET(path, handler)
 	e.POST(path, handler)
