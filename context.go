@@ -30,8 +30,9 @@ func (c *Context) Json(status int, data interface{}) {
 	c.ResponseWriter.WriteHeader(status)
 }
 
-func (c *Context) String(s string) {
+func (c *Context) String(status int, s string) {
 	c.ResponseWriter.Write([]byte(s))
+	c.ResponseWriter.WriteHeader(status)
 }
 
 func (c *Context) Param(key string) string {

@@ -9,11 +9,11 @@ simple go web framework
     - [ ] Basic midware
 * Request
     - [x] Query process
-    - [ ] Form process
+    - [x] Form process
     - [ ] Upload process
     - [ ] Data validataion
     - [ ] Data binding
-* Output format
+* Output
     - [x] Json
     - [x] String
     - [ ] Template
@@ -28,6 +28,7 @@ func main() {
 	e.GET("/json", Json)
 	e.GET("/query", Query)
 	e.ANY("/user/:name", User)
+	e.POST("/upload", Upload)
 
 	e.AddGlobalMidware(CustomGlobalMidware())
 	e.Run(":8082")
@@ -64,6 +65,20 @@ func User(c *blue.Context) {
 	c.String(name)
 }
 
+func Upload(c *blue.Context) {
+	fh, err := c.FormFile("file")
+	if err != nil {
+		c.String(404, "")
+		return
+	}
+	err = c.SaveUploadedFile(fh, "/tmp/tmp")
+	if err != nil {
+		c.String(404, "")
+		return
+	}
+
+	c.String(http.StatusOK, "upload successfully")
+}
 
 
 ```
